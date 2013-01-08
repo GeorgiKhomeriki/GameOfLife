@@ -74,7 +74,7 @@ public abstract class AbstractGame {
 				updateFPS();
 			}
 			Display.update();
-			Display.sync(60);
+			Display.sync(20);
 		}
 
 		shutdown();
@@ -97,7 +97,7 @@ public abstract class AbstractGame {
 		glOrtho(0, screenWidth, 0, screenHeight, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 		
-		glClearColor(0.1f, 0.2f, 0.5f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		//glEnable(GL_TEXTURE_2D);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

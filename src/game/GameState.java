@@ -29,16 +29,16 @@ public class GameState implements IGameState {
 
 	@Override
 	public void init() {
-		cells = new boolean[50][50];
+		cells = new boolean[100][100];
 		initRandomGrid();
 	}
 
 	private void initRandomGrid() {
 		int gridWidth = cells.length;
 		int gridHeight = cells[0].length;
-		for (int i = 1; i < gridWidth; i++) {
-			for (int j = 1; j < gridHeight; j++) {
-				cells[i][j] = Random.get().nextFloat() <= 0.1f;
+		for (int i = 0; i < gridWidth; i++) {
+			for (int j = 0; j < gridHeight; j++) {
+				cells[i][j] = Random.get().nextFloat() <= 0.5f;
 			}
 		}
 	}
@@ -126,13 +126,7 @@ public class GameState implements IGameState {
 			for (int j = 1; j < gridHeight - 1; j++) {
 				boolean isAlive = cells[i][j];
 				int neighbors = countNeighbors(i, j);
-				if (neighbors != 0)
-					System.out.println(neighbors);
-				if ((neighbors == 2 && isAlive) || neighbors == 3) {
-					newCells[i][j] = true;
-				} else {
-					newCells[i][j] = false;
-				}
+				newCells[i][j] = neighbors == 2 && isAlive || neighbors == 3;
 			}
 		}
 		this.cells = newCells;
