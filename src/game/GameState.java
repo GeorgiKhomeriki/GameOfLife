@@ -1,26 +1,33 @@
 package game;
 
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_LINES;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glVertex2f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import util.Random;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glVertex2f;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.GL_LINES;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-
+import engine.Font;
 import engine.IGameState;
 
 public class GameState implements IGameState {
 	public static final String STATE_NAME = "STATE_GAME";
 
 	private boolean[][] cells;
+	private int alive;
+	
+	private Font font; 
 
 	@Override
 	public String getName() {
@@ -31,14 +38,18 @@ public class GameState implements IGameState {
 	public void init() {
 		cells = new boolean[100][100];
 		initRandomGrid();
+		font = new Font("resources/fonts/kromasky_16x16.png", 59, 16);
 	}
 
 	private void initRandomGrid() {
+		alive = 0;
 		int gridWidth = cells.length;
 		int gridHeight = cells[0].length;
 		for (int i = 0; i < gridWidth; i++) {
 			for (int j = 0; j < gridHeight; j++) {
 				cells[i][j] = Random.get().nextFloat() <= 0.5f;
+				if(cells[i][j])
+					alive++;
 			}
 		}
 	}
@@ -57,10 +68,16 @@ public class GameState implements IGameState {
 	public void render(int delta) {
 		glLoadIdentity();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		renderGrid();
 		renderCells();
-		
+		renderInfo();
+	}
+	
+	private void renderInfo() {
+		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		font.renderText("ALIVE:" + alive, 10.0f, 10.0f);
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	private void renderCells() {
@@ -119,6 +136,7 @@ public class GameState implements IGameState {
 	}
 
 	private void updateCells() {
+		alive = 0;
 		int gridWidth = cells.length;
 		int gridHeight = cells[0].length;
 		boolean[][] newCells = new boolean[gridWidth][gridHeight];
@@ -127,6 +145,9 @@ public class GameState implements IGameState {
 				boolean isAlive = cells[i][j];
 				int neighbors = countNeighbors(i, j);
 				newCells[i][j] = neighbors == 2 && isAlive || neighbors == 3;
+				if(newCells[i][j]) {
+					alive++;
+				}
 			}
 		}
 		this.cells = newCells;
